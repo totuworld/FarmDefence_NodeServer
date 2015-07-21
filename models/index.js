@@ -1,4 +1,5 @@
 'use strict';
+/// <reference path="typings/node/node.d.ts"/>
 
 var fs        = require('fs');
 var path      = require('path');
@@ -6,6 +7,7 @@ var Sequelize = require('sequelize');
 var basename  = path.basename(module.filename);
 var env       = process.env.NODE_ENV || 'development';
 var config    = require(__dirname + '/../config/config.json')[env];
+console.log(config);
 var sequelize = new Sequelize(config.database, config.username, config.password, config);
 var db        = {};
 

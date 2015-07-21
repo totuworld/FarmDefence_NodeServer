@@ -3,19 +3,21 @@
     "username": "root",
     "password": 1234,
     "database": "farmdefence",
-    "host": "127.0.0.1",
-    "dialect": "mariadb"
+    "host": "localhost",
+    "port": 6306,
+    "dialect": "mariadb",
+    "pool": { "max": 5, "min": 0, "idle": 10000 }
   },
   "test": {
     "username": "root",
-    "password": null,
+    "password": 1234,
     "database": "database_test",
     "host": "127.0.0.1",
     "dialect": "mysql"
   },
   "production": {
     "username": "root",
-    "password": null,
+    "password": 1234,
     "database": "database_production",
     "host": "127.0.0.1",
     "dialect": "mysql"
