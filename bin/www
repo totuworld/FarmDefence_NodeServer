@@ -8,7 +8,7 @@
 var app = require('../app');
 var debug = require('debug')('farm_defence_nodeWebServer:server');
 var http = require('http');
-var models = require("../models");
+var models = require("../models"); //추가한 부분.
 
 /**
  * Get port from environment and store in Express.
@@ -27,10 +27,12 @@ var server = http.createServer(app);
  * Listen on provided port, on all network interfaces.
  */
 
-// server.listen(port);
+// server.listen(port); //주석처리
 server.on('error', onError);
 server.on('listening', onListening);
 
+//추가한 부분.
+	//sequelize의 싱크 작업을 시작하고 완료되면 설정된 포트를 통해서 통신 가능하도록 한다.
 models.sequelize.sync().then(function () {
   server.listen(app.get('port'), function() {
     debug('Express server listening on port ' + server.address().port);

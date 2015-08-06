@@ -1,5 +1,5 @@
 'use strict';
-/// <reference path="typings/node/node.d.ts"/>
+
 module.exports = function(sequelize, DataTypes) {
   var usercore = sequelize.define('usercore', {
     no: {type : DataTypes.INTEGER.UNSIGNED,  primaryKey: true}
@@ -9,13 +9,10 @@ module.exports = function(sequelize, DataTypes) {
     , hearts : {type : DataTypes.INTEGER(4).UNSIGNED, defaultValue:0}
     , highScore : {type : DataTypes.INTEGER.UNSIGNED, defaultValue:0}
     , loginTime : {type : DataTypes.INTEGER(10).UNSIGNED, defaultValue:0}
-  }, {
-    classMethods: {
-      associate: function(models) {
-        // associations can be defined here
-      }
-    }
-    , timestamps:false
+  }, 
+  {
+    timestamps:false,
+    tableName: 'usercore'
   });
   return usercore;
 };
