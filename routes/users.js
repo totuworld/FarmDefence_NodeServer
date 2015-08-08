@@ -26,18 +26,26 @@ router.post('/add/:userID', function(req, res) {
       callback(null, createdUserCore.no);
     });
   }
+  //userupgrade테이블에 업그레이드 기록할 행을 추가한다.
+  function CreateUserUpgradeRow(no, callback) {
+    models.userupgrade.create({no:no})
+    .then(function(createdUserUpgrade) {
+      callback(null, no);
+    });
+  }
 
   async.waterfall([
     CheckIsHaveID,
-    CreateAccount
-  ], function(err, usercore_id) {
+    CreateAccount,
+    CreateUserUpgradeRow
+  ], function(err, usercore_no) {
     if(err) {
       //err:아이디가 중복되는 경우.
       res.send('exist');
     }
     else {
       //완료 결과 전송.
-      res.send('done0'+usercore_id);
+      res.send('done0'+usercore_no);
     }
   });
   
