@@ -1,5 +1,5 @@
 'use strict';
-/// <reference path="typings/node/node.d.ts"/>
+
 module.exports = function(sequelize, DataTypes) {
   var useritem = sequelize.define('useritem', {
     no: {type : DataTypes.INTEGER.UNSIGNED,  primaryKey: true}
@@ -8,12 +8,8 @@ module.exports = function(sequelize, DataTypes) {
     , amount : {type : DataTypes.INTEGER(4).UNSIGNED, defaultValue:0}
     , use : {type : DataTypes.BOOLEAN, defaultValue:false}
   }, {
-    classMethods: {
-      associate: function(models) {
-        // associations can be defined here
-      }
-    }
-    , timestamps:false
+    timestamps:false,
+    tableName: 'useritem'
   });
   return useritem;
 };

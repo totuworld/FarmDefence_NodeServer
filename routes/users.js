@@ -27,17 +27,17 @@ router.post('/add/:userID', function(req, res) {
     });
   }
 
-  async.series([
+  async.waterfall([
     CheckIsHaveID,
     CreateAccount
-  ], function(err, results) {
+  ], function(err, usercore_id) {
     if(err) {
       //err:아이디가 중복되는 경우.
       res.send('exist');
     }
     else {
       //완료 결과 전송.
-      res.send('done0'+results[1]);
+      res.send('done0'+usercore_id);
     }
   });
   

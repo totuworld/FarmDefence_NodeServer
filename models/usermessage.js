@@ -1,5 +1,5 @@
 'use strict';
-/// <reference path="typings/node/node.d.ts"/>
+
 module.exports = function(sequelize, DataTypes) {
   var usermessage = sequelize.define('usermessage', {
     no: {type : DataTypes.INTEGER.UNSIGNED,  primaryKey: true}
@@ -10,12 +10,8 @@ module.exports = function(sequelize, DataTypes) {
     , amount : {type : DataTypes.INTEGER(6).UNSIGNED, defaultValue:0}
     , time : {type : DataTypes.INTEGER(10).UNSIGNED, defaultValue:0}
   }, {
-    classMethods: {
-      associate: function(models) {
-        // associations can be defined here
-      }
-    }
-    , timestamps:false
+    timestamps:false,
+    tableName: 'usermessage'
   });
   return usermessage;
 };

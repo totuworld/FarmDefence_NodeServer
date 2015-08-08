@@ -1,5 +1,5 @@
 'use strict';
-/// <reference path="typings/node/node.d.ts"/>
+
 module.exports = function(sequelize, DataTypes) {
   var userupgrade = sequelize.define('userupgrade', {
     no: {type : DataTypes.INTEGER.UNSIGNED,  primaryKey: true}
@@ -8,12 +8,8 @@ module.exports = function(sequelize, DataTypes) {
     , defLv : {type : DataTypes.INTEGER(3).UNSIGNED, defaultValue:1}
     , moneyLv : {type : DataTypes.INTEGER(3).UNSIGNED, defaultValue:1}
   }, {
-    classMethods: {
-      associate: function(models) {
-        // associations can be defined here
-      }
-    }
-    , timestamps:false
+    timestamps:false,
+    tableName: 'usercore'
   });
   return userupgrade;
 };
