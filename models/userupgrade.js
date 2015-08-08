@@ -9,7 +9,7 @@ module.exports = function(sequelize, DataTypes) {
     , moneyLv : {type : DataTypes.INTEGER(3).UNSIGNED, defaultValue:1}
   }, {
     timestamps:false,
-    tableName: 'usercore'
+    tableName: 'userupgrade'
   });
   return userupgrade;
 };
