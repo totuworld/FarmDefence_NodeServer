@@ -91,24 +91,30 @@ router.get('/get/:no', function(req, res) {
   function FillHeartsAndUpdateLoginTime(userCore, callback) {
     var now = new Date();
     var updateOptions = {};
-    updateOptions['loginTime'] = ToTimeString(now);
     
     if(userCore.hearts < 5) {
-      var spendTime = now.getTime() - new Date(userCore.loginTime).getTime();
-      var totalHeart = userCore.hearts + Math.floor(spendTime/ 600*1000 );
+      var lastLoginTime = new Date(userCore.loginTime);
+      var spendTime = now.getTime() - lastLoginTime.getTime();
+      var addHeart = Math.floor(spendTime/ 600*1000 );
+      var totalHeart = addHeart;
       if(totalHeart > 5) {
         totalHeart = 5;
       }
       if(userCore.hearts != totalHeart) {
-        updateOptions['hearts'] = totalHeart;
+        userCore.loginTime = (lastLoginTime.getTime() + (addHeart*600*1000))/1000; 
         userCore.hearts = totalHeart;
+        updateOptions['hearts'] = totalHeart;
+        updateOptions['loginTime'] =  ToTimeString(new Date(userCore.loginTime));
       }
+    }
+    else {
+      userCore.loginTime = (now.gettime()/1000);
+      updateOptions['loginTime'] = ToTimeString(now);
     }
 
     models.usercore
       .update(updateOptions, {where:{no:userCore.no}})
       .then(function(updateResults){
-        userCore.loginTime = now.getTime()/1000; 
         callback(null, userCore.loginTime);
       });
   }
