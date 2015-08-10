@@ -5,6 +5,7 @@ var router = express.Router();
 
 var models = require('../models');
 var async = require('async');
+var xmlbuilder = require('xmlbuilder');
 
 
 
@@ -49,6 +50,55 @@ router.post('/add/:userID', function(req, res) {
     }
   });
   
+});
+
+
+/* GET 사용자의 기본 정보를 로딩한다 */
+router.get('/get/:no', function(req, res) {
+  //usercore 데이터 로딩
+  function GetUserCore(callback) {
+    models.usercore.find({where:{no:req.params.no}})
+    .then(function(findUserCore) {
+      //사용자  정보가 있는지 확인
+      if(findUserCore == null || findUserCore == undefined) {
+        //err:존재하지 않는 사용자
+        callback(true);
+        return;
+      }
+      
+      //정상적인 콜백.
+      callback(null, findUserCore);
+    });
+  }
+  
+  //userupgrade 데이터 로딩
+  function GetUserUpgrade(callback) {
+    models.userupgrade.find({where:{no:req.params.no}})
+    .then(function(findUserUpgrade) {
+      //정보가 있는지 확인
+      if(findUserUpgrade == null || findUserUpgrade == undefined) {
+        //err:존재하지 않는 정보
+        callback(true);
+        return;
+      }
+      
+      //정상적인 콜백.
+      callback(null, findUserUpgrade);
+    });
+  }
+  
+  async.parallel([
+    GetUserCore,
+    GetUserUpgrade
+  ], function(err, results) {
+    if(err) {
+      //err:사용자 정보가 존재하지 않는 경우.
+      res.send('none0');
+    }
+    else {
+      //TODO: 전송할 결과 생성.
+    }
+  });
 });
 
 
