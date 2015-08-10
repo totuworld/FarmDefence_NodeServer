@@ -87,6 +87,38 @@ router.get('/get/:no', function(req, res) {
     });
   }
   
+  //하트가 5개 이하인 상태이고 10분이 지났으면 하트를 채운다.
+  function FillHeartsAndUpdateLoginTime(userCore, callback) {
+    var now = new Date();
+    var updateOptions = {};
+    updateOptions['loginTime'] = ToTimeString(now);
+    
+    if(userCore.hearts < 5) {
+      var spendTime = now.getTime() - new Date(userCore.loginTime).getTime();
+      var totalHeart = userCore.hearts + Math.floor(spendTime/ 600*1000 );
+      if(totalHeart > 5) {
+        totalHeart = 5;
+      }
+      if(userCore.hearts != totalHeart) {
+        updateOptions['hearts'] = totalHeart;
+        userCore.hearts = totalHeart;
+      }
+    }
+
+    models.usercore
+      .update(updateOptions, {where:{no:userCore.no}})
+      .then(function(updateResults){
+        userCore.loginTime = now.getTime()/1000; 
+        callback(null, userCore.loginTime);
+      });
+  }
+  
+  //Date()를 YYYY-MM-DD hh:mm:ss 형태로 변경.
+  function ToTimeString(date) {
+    return date.getFullYear() + '-' + (date.getMonth()+1) + '-' + date.getDate() + ' ' 
+      + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds(); 
+  }
+  
   async.parallel([
     GetUserCore,
     GetUserUpgrade
@@ -97,6 +129,30 @@ router.get('/get/:no', function(req, res) {
     }
     else {
       //TODO: 전송할 결과 생성.
+      FillHeartsAndUpdateLoginTime(results[0], function(nowTime) {
+        var returnObj = {
+          farmdefence: {
+            usercore: {
+              'ID':results[0].id,
+              'gems':results[0].gems,
+              'coins':results[0].coins,
+              'hearts':results[0].hearts,
+              'highScore':results[0].highScore,
+              'loginTime':results[0].loginTime,
+              'serverTime':nowTime,
+              'upgradeNo':results[1].upgradeNo,
+              'attLv':results[1].attLv,
+              'defLv':results[1].defLv,
+              'moneyLv':results[1].moneyLv,
+            }
+          }
+        };
+        
+        var xmlResult = xmlbuilder.create(returnObj).end({ pretty: true});
+        res.set({'Content-type':'text/xml', 'charset':'UTF-8'});
+        res.send(xmlResult);
+      });
+     
     }
   });
 });
