@@ -92,30 +92,51 @@ router.get('/get/:no', function(req, res) {
     var now = new Date();
     var updateOptions = {};
     
+    var lastLoginTime = new Date(userCore.loginTime*1000);
+    var spendTime = now.getTime() - lastLoginTime.getTime();
+    
+    var addHeart = Math.floor(spendTime/ (600*1000) );
+    
+    //하트 보유량이 최대치보다 적은가?
     if(userCore.hearts < 5) {
-      var lastLoginTime = new Date(userCore.loginTime);
-      var spendTime = now.getTime() - lastLoginTime.getTime();
-      var addHeart = Math.floor(spendTime/ 600*1000 );
-      var totalHeart = addHeart;
+      //하트가 하나라도 새롭게 추가되는가?
+      if(addHeart <= 0) {
+        var returnTime = Math.floor(now.getTime()/1000); 
+        callback(returnTime);
+        return;
+      }
+      
+      var totalHeart = userCore.hearts + addHeart;
+      //하트 보유량이 최대치보다 많아지는가?
       if(totalHeart > 5) {
         totalHeart = 5;
+        userCore.loginTime = now.getTime();
+        //로그인 타임을 최신으로 입력.
+        updateOptions['loginTime'] = ToTimeString(now);
       }
-      if(userCore.hearts != totalHeart) {
-        userCore.loginTime = (lastLoginTime.getTime() + (addHeart*600*1000))/1000; 
+      else {
+        
+        addHeart = 5- userCore.hearts;
+        userCore.loginTime = lastLoginTime.getTime() + (addHeart*600*1000);
+        //로그인 타임을 얻은 하트만큼만 최신화하여 spendTime계산 시 손해보지 않도록 한다.
+        updateOptions['loginTime'] = ToTimeString(new Date(userCore.loginTime*1000)); 
+      }
+      
+      if(addHeart > 0) { 
         userCore.hearts = totalHeart;
         updateOptions['hearts'] = totalHeart;
-        updateOptions['loginTime'] =  ToTimeString(new Date(userCore.loginTime));
       }
     }
     else {
-      userCore.loginTime = (now.gettime()/1000);
+      userCore.loginTime = now.getTime();
       updateOptions['loginTime'] = ToTimeString(now);
     }
 
+    //usercore값을  updateOptions에 맞춰서 업데이트.
     models.usercore
       .update(updateOptions, {where:{no:userCore.no}})
       .then(function(updateResults){
-        callback(null, userCore.loginTime);
+        callback(userCore.loginTime);
       });
   }
   
@@ -146,7 +167,7 @@ router.get('/get/:no', function(req, res) {
               'highScore':results[0].highScore,
               'loginTime':results[0].loginTime,
               'serverTime':nowTime,
-              'upgradeNo':results[1].upgradeNo,
+              'upgradeNo':results[1].no,
               'attLv':results[1].attLv,
               'defLv':results[1].defLv,
               'moneyLv':results[1].moneyLv,

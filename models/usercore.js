@@ -9,7 +9,7 @@ module.exports = function(sequelize, DataTypes) {
 	  , hearts : { type : DataTypes.INTEGER(3).UNSIGNED, defaultValue: 0}
 	  , highScore : { type : DataTypes.INTEGER.UNSIGNED, defaultValue: 0}
 	  , loginTime : { type : DataTypes.DATE, defaultValue: '2002-06-05 00:00:00'
-		  , get:function(){var convertTime=new Date(this.getDataValue('loginTime')); return convertTime.getTime()/1000;}}
+		  , get:function(){var convertTime=new Date(this.getDataValue('loginTime')); return Math.floor(convertTime.getTime()/1000);}}
   }, {
 	  timestamps: false,
 	  tableName: 'usercore'
