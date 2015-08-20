@@ -16,7 +16,7 @@ router.post('/add/:userID', function(req, res) {
   function CheckIsHaveID(callback) {
     models.usercore.find({where:{id:req.params.userID}})
     .then(function(findUserCoreData) {
-      callback( !(findUserCoreData == null || findUserCoreData == undefined) );
+      callback( !(findUserCoreData === null || findUserCoreData === undefined) );
     });
   }
   //아이디를 등록한다.
@@ -60,7 +60,7 @@ router.get('/get/:no', function(req, res) {
     models.usercore.find({where:{no:req.params.no}})
     .then(function(findUserCore) {
       //사용자  정보가 있는지 확인
-      if(findUserCore == null || findUserCore == undefined) {
+      if(findUserCore === null || findUserCore === undefined) {
         //err:존재하지 않는 사용자
         callback(true);
         return;
@@ -76,7 +76,7 @@ router.get('/get/:no', function(req, res) {
     models.userupgrade.find({where:{no:req.params.no}})
     .then(function(findUserUpgrade) {
       //정보가 있는지 확인
-      if(findUserUpgrade == null || findUserUpgrade == undefined) {
+      if(findUserUpgrade === null || findUserUpgrade === undefined) {
         //err:존재하지 않는 정보
         callback(true);
         return;
@@ -170,7 +170,7 @@ router.get('/get/:no', function(req, res) {
               'upgradeNo':results[1].no,
               'attLv':results[1].attLv,
               'defLv':results[1].defLv,
-              'moneyLv':results[1].moneyLv,
+              'moneyLv':results[1].moneyLv
             }
           }
         };
