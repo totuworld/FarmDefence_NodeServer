@@ -10,46 +10,64 @@ var xmlbuilder = require('xmlbuilder');
 
 
 /* POST 사용자 아이디를 등록할 때 사용한다. */
-router.post('/add/:userID', function(req, res) {
-  
-  //아이디 중복 확인
-  function CheckIsHaveID(callback) {
-    models.usercore.find({where:{id:req.params.userID}})
-    .then(function(findUserCoreData) {
-      callback( !(findUserCoreData === null || findUserCoreData === undefined) );
-    });
-  }
-  //아이디를 등록한다.
-  function CreateAccount(callback) {
-    models.usercore
-    .create({id:req.parmas.userID, gems:20, coins:1000, hearts:5})
-    .then(function(createdUserCore) {
-      callback(null, createdUserCore.no);
-    });
-  }
-  //userupgrade테이블에 업그레이드 기록할 행을 추가한다.
-  function CreateUserUpgradeRow(no, callback) {
-    models.userupgrade.create({no:no})
-    .then(function(createdUserUpgrade) {
-      callback(null, no);
-    });
-  }
-
-  async.waterfall([
-    CheckIsHaveID,
-    CreateAccount,
-    CreateUserUpgradeRow
-  ], function(err, usercore_no) {
-    if(err) {
-      //err:아이디가 중복되는 경우.
-      res.send('exist');
+router.post('/add/:userID', function (req, res) {
+    
+    //중복을 체크
+    function CheckExistID(findUserCoreData) {
+        return new Promise(function (resolve, reject) {
+                //중복인가?
+                if (!(findUserCoreData == null || findUserCoreData == undefined)) {
+                    //중복이 아니다.
+                    resolve();
+                }
+                else {
+                    //중복이다.
+                    reject();
+                }
+            });
     }
-    else {
-      //완료 결과 전송.
-      res.send('done0'+usercore_no);
+    
+    //usercore에 추가된 신규 row를 기준으로 결과 생성 
+    function MakeCreateResult(createdUserCore) {
+        return new Promise(function (resolve, reject) {
+            resolve(`done0${createdUserCore.no}`);
+        });
     }
-  });
-  
+    
+    //userupgrade테이블에 업그레이드 기록할 행을 추가한다.
+    function CreateUserUpgradeRow(createdUserCore) {
+        return new Promise(function (resolve, reject) {
+            models.userupgrade
+            .create({ no: createdUserCore.no })
+            .then(function(createUserUpgrade){
+                resolve(createdUserCore);
+            });
+        });
+    }
+    
+    //usercore 테이블을 id로 검색
+    models.usercore.findOne({ where: { id: req.params.userID } })
+        //중복 사용중인 체크
+        .then(CheckExistID)
+        //중복 아니므로 아이디 등록.
+        .then(function () {
+            return models.usercore
+                .create({ id: req.parmas.userID, gems: 20, coins: 1000, hearts: 5 });
+        })
+        //업그레이드 정보를 기록할 row를 생성한다.
+        .then(CreateUserUpgradeRow)
+        //생성에 관한 결과 전달
+        .then(MakeCreateResult)
+        //중복 일 때 예외처리
+        .catch(function (err) {
+            return new Promise(function (resolve, reject) {
+                resolve('exist');
+            });
+        })
+        //최종적으로 결과를 전송한다.
+        .then(function (result) {
+            res.send(result);
+        });
 });
 
 
